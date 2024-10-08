@@ -1,144 +1,99 @@
-"use client";
+"use client"
 
-import { Search, Menu, Grid, MessageSquare, TrendingUp, Heart, Play } from "lucide-react";
-import { useState, useEffect } from "react";
-import LogoMinato from "./LogoMinato";
-import CanvasCursor from "./CursorCanvas/canvas-cursor";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import React from "react";
+import { Search, Menu, Grid, MessageSquare, TrendingUp, Heart, Play } from "lucide-react"
+import { useState, useEffect, useRef } from "react"
+import LogoMinato from "./LogoMinato"
+import CanvasCursor from "./CursorCanvas/canvas-cursor"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import React from "react"
 
 interface SearchResult {
-  id: number;
-  name: string;
-  price: number;
+  id: number
+  name: string
+  price: number
 }
 
 export default function Component() {
+  const [isScrolled, setIsScrolled] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [isSearching, setIsSearching] = useState(false)
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [isVideoLoading, setIsVideoLoading] = useState(true)
 
-  const recentDesigns = [
-    { title: "Marketing presentation", image: "/1.png", modifiedDays: 2 },
-    { title: "Product brochure", image: "/2.png", modifiedDays: 3 },
-    { title: "Instagram post", image: "/3.png", modifiedDays: 1 },
-    { title: "Business card", image: "/4.png", modifiedDays: 4 },
-]
+  const productListRef = useRef<HTMLDivElement>(null)
+  const videoSuggestionsRef = useRef<HTMLDivElement>(null)
 
-  const placeholders = [
-    "Search for any product...",
-    "Search for anything...",
-    "What's on your mind...?",
-    "Discover new ideas...",
-    "Find answers here...",
-  ];
-  const [currentPlaceholder, setCurrentPlaceholder] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [gradient, setGradient] = useState("from-blue-500 to-purple-500");
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isSearching, setIsSearching] = useState(false);
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isVideoLoading, setIsVideoLoading] = useState(true);
-
-  // Exemple de données pour les vidéos
   const mainVideo = {
     id: "main1",
     title: "Découvrez les dernières tendances en AI",
-    thumbnail: "/placeholder.svg?height=240&width=360",
+    thumbnail: "https://res.cloudinary.com/dqljfnmpk/video/upload/v1724933253/Download_11_xyj1eg.mp4",
     duration: "10:30"
-  };
+  }
 
   const suggestedVideos = [
     { id: "sugg1", title: "Comment utiliser l'IA dans votre entreprise", thumbnail: "/placeholder.svg?height=120&width=180", duration: "5:15" },
     { id: "sugg2", title: "L'avenir de l'IA dans le commerce électronique", thumbnail: "/placeholder.svg?height=120&width=180", duration: "7:45" },
     { id: "sugg3", title: "IA et personnalisation : ce que vous devez savoir", thumbnail: "/placeholder.svg?height=120&width=180", duration: "6:20" },
     { id: "sugg4", title: "Les meilleures pratiques en IA pour 2024", thumbnail: "/placeholder.svg?height=120&width=180", duration: "8:00" },
-  ];
+  ]
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
+      setIsScrolled(window.scrollY > 50)
+    }
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  useEffect(() => {
-    const placeholderInterval = setInterval(() => {
-      setIsAnimating(true);
-      setTimeout(() => {
-        setCurrentPlaceholder((prev) => (prev + 1) % placeholders.length);
-        setIsAnimating(false);
-      }, 500);
-    }, 4000);
-
-    const gradientInterval = setInterval(() => {
-      const gradients = [
-        "from-blue-500 via-pink-500 to-purple-500",
-        "from-green-600 via-purple-600 to-blue-600",
-        "from-pink-500 to-yellow-500 via-red-500",
-      ];
-      setGradient(gradients[Math.floor(Math.random() * gradients.length)]);
-    }, 8000);
-
-    return () => {
-      clearInterval(placeholderInterval);
-      clearInterval(gradientInterval);
-    };
-  }, []);
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
 
   useEffect(() => {
     if (isSearching) {
       const timer = setTimeout(() => {
-        setIsVideoLoading(false);
-      }, 2000);
-      return () => clearTimeout(timer);
+        setIsVideoLoading(false)
+      }, 2000)
+      return () => clearTimeout(timer)
     }
-  }, [isSearching]);
-
-  const gradientStyle = {
-    background: "linear-gradient(45deg, #0F5CD8FF, #604897FF, #F0097CFF)",
-    WebkitBackgroundClip: "text",
-    WebkitTextFillColor: "transparent",
-    backgroundClip: "text",
-    color: "transparent",
-  };
-
+  }, [isSearching])
 
   const handleSearch = async (query: string) => {
-    setIsSearching(true);
-    setIsLoading(true);
-    setIsVideoLoading(true);
-    // Simuler un appel API
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    setIsSearching(true)
+    setIsLoading(true)
+    setIsVideoLoading(true)
+    await new Promise((resolve) => setTimeout(resolve, 2000))
     setSearchResults([
-        { id: 1, name: "Produit 1", price: 99.99 },
-        { id: 2, name: "Produit 2", price: 149.99 },
-        { id: 3, name: "Produit 3", price: 199.99 },
-    ]);
-    setIsLoading(false);
-    setIsVideoLoading(false);
-  };
+      { id: 1, name: "Produit 1", price: 99.99 },
+      { id: 2, name: "Produit 2", price: 149.99 },
+      { id: 3, name: "Produit 3", price: 199.99 },
+    ])
+    setIsLoading(false)
+    setIsVideoLoading(false)
+  }
+  const recentDesigns = [
+    {  image: "/1.png", modifiedDays: 2 },
+    {  image: "/2.png", modifiedDays: 3 },
+    {  image: "/3.png", modifiedDays: 1 },
+    {  image: "/4.png", modifiedDays: 4 },
+]
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-  };
+    setSearchQuery(e.target.value)
+  }
 
-  const handleSubmit = (e: { preventDefault: () => void; }) => {
-    e.preventDefault();
-    handleSearch(searchQuery);
-  };
-
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    handleSearch(searchQuery)
+  }
   const handleCategoryClick = (category: string) => {
     setSearchQuery(category);
     handleSearch(category);
   };
 
   function VideoSuggestions({ mainVideo, suggestedVideos, isLoading }: {
-    mainVideo: any;
-    suggestedVideos: any[];
-    isLoading: boolean;
+    mainVideo: any
+    suggestedVideos: any[]
+    isLoading: boolean
   }) {
     if (isLoading) {
       return (
@@ -153,9 +108,9 @@ export default function Component() {
             </CardContent>
           </Card>
 
-          <div className="grid grid-cols-2 gap-2">
+          <div className="flex overflow-x-auto space-x-4 pb-4 md:grid md:grid-cols-2 md:gap-4 md:space-x-0">
             {[1, 2, 3, 4].map((index) => (
-              <Card key={index} className="bg-gray-800 rounded-md overflow-hidden">
+              <Card key={index} className="bg-gray-800 rounded-md overflow-hidden flex-shrink-0 w-60 md:w-auto">
                 <CardContent className="p-0">
                   <div className="w-full h-24 bg-gray-700"></div>
                   <div className="p-2">
@@ -185,9 +140,9 @@ export default function Component() {
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-2 gap-2">
-          {suggestedVideos.map((video: { id: React.Key | null | undefined; thumbnail: string | undefined; title: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | Promise<React.AwaitedReactNode> | null | undefined; duration: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; }) => (
-            <Card key={video.id} className="bg-gray-800 rounded-md overflow-hidden">
+        <div className="flex overflow-x-auto space-x-4 pb-4 md:grid md:grid-cols-2 md:gap-4 md:space-x-0">
+          {suggestedVideos.map((video) => (
+            <Card key={video.id} className="bg-gray-800 rounded-md overflow-hidden flex-shrink-0 w-60 md:w-auto">
               <CardContent className="p-0 relative">
                 <img src={video.thumbnail} alt={String(video.title)} className="w-full h-24 object-cover" />
                 <div className="absolute bottom-1 right-1 bg-black bg-opacity-75 text-white text-xs px-1 rounded">
@@ -204,41 +159,38 @@ export default function Component() {
     )
   }
 
-  
-
   function SearchResultCard({ result }: { result: SearchResult }) {
     return (
-      <div className="space-y-4">
-          {recentDesigns.map((design, index) => (
-              <Card key={result.id} className="bg-gray-800 rounded-md overflow-hidden w-full">
-                  <CardContent className="p-3">
-                      <div className="w-full h-32 bg-gray-700 rounded-md mb-3">
-                          <img src={design.image} alt={design.title} className="w-full h-full object-cover rounded-md" />
-                      </div>
-                      <h3 className="text-base font-semibold text-white truncate">{design.title}</h3>
-                      <p className="text-xs text-gray-50">Price: {result.price} €</p>
-                      <p className="text-xs text-gray-400">Modified {design.modifiedDays} days ago</p>
-                  </CardContent>
-                  <CardFooter className="bg-gray-700 p-1.5 flex justify-between">
-                      <Button variant="ghost" size="sm" className="text-white hover:text-gray-200 text-xs px-1.5 py-1 z-10">
-                          <MessageSquare className="w-3 h-3 mr-1" />
-                          Chat
-                      </Button>
-                      <Button variant="ghost" size="sm" className="text-white hover:text-gray-200 text-xs px-1.5 py-1 z-10">
-                          <TrendingUp className="w-3 h-3 mr-1" />
-                          Track
-                      </Button>
-                      <Button variant="ghost" size="sm" className="text-white hover:text-gray-200 text-xs px-1.5 py-1 z-10">
-                          <Heart className="w-3 h-3 mr-1" />
-                          Fav
-                      </Button>
-                  </CardFooter>
-              </Card>
-          ))}
+      <div className="space-y-4 z-10">
+        {recentDesigns.map((design, index) => (
+      <Card key={index} className="bg-gray-800 rounded-md overflow-hidden w-full">
+        <CardContent className="p-3">
+          <div className="w-full h-32 bg-gray-700 rounded-md mb-3">
+            <img src={design.image} alt={result.name} className="w-full h-full object-cover rounded-md" />
+          </div>
+          <h3 className="text-base font-semibold text-white truncate">{result.name}</h3>
+          <p className="text-xs text-gray-50">Price: {result.price} €</p>
+          <p className="text-xs text-gray-400">{design.modifiedDays} days ago</p>
+        </CardContent>
+        <CardFooter className="bg-gray-700 p-1.5 flex justify-between">
+          <Button variant="ghost" size="sm" className="text-white hover:text-gray-200 text-xs px-1.5 py-1 z-10">
+            <MessageSquare className="w-3 h-3 mr-1" />
+            Chat
+          </Button>
+          <Button variant="ghost" size="sm" className="text-white hover:text-gray-200 text-xs px-1.5 py-1 z-10">
+            <TrendingUp className="w-3 h-3 mr-1" />
+            Track
+          </Button>
+          <Button variant="ghost" size="sm" className="text-white hover:text-gray-200 text-xs px-1.5 py-1 z-10">
+            <Heart className="w-3 h-3 mr-1" />
+            Fav
+          </Button>
+        </CardFooter>
+      </Card>
+      ))}
       </div>
-  );
-
-}
+    )
+  }
 
   return (
     <div className="min-h-screen font-sans">
@@ -268,7 +220,7 @@ export default function Component() {
               <span className="px-3 py-1 bg-zinc-800 text-xs text-white rounded-full">
                 AI product search
               </span>
-              <h1 className="text-5xl font-bold max-w-4xl leading-tight" style={gradientStyle}>
+              <h1 className="text-5xl font-bold max-w-4xl leading-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500">
                 Find brands & products , faster and better with AI.
               </h1>
             </div>
@@ -279,7 +231,7 @@ export default function Component() {
                   type="text"
                   value={searchQuery}
                   onChange={handleInputChange}
-                  placeholder={placeholders[currentPlaceholder]}
+                  placeholder="Search for any product..."
                   className="w-full py-4 pl-14 pr-20 bg-zinc-900 rounded-full text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-600"
                 />
                 <button
@@ -290,24 +242,15 @@ export default function Component() {
                 </button>
               </form>
               <div className="flex flex-wrap justify-center gap-4">
-                <button
-                  onClick={() => handleCategoryClick("Browse Categories")}
-                  className="flex items-center space-x-2 px-4 py-2 bg-zinc-800 rounded-md text-sm text-white font-medium z-10"
-                >
+                <button onClick={() => handleCategoryClick("Browse Categories")} className="flex items-center space-x-2 px-4 py-2 bg-zinc-800 rounded-md text-sm text-white font-medium z-10">
                   <Menu className="w-4 h-4" />
                   <span>Browse Categories</span>
                 </button>
-                <button
-                  onClick={() => handleCategoryClick("Builder")}
-                  className="flex items-center space-x-2 px-4 py-2 bg-zinc-800 rounded-md text-sm text-white font-medium z-10"
-                >
+                <button onClick={() => handleCategoryClick("Builder")} className="flex items-center space-x-2 px-4 py-2 bg-zinc-800 rounded-md text-sm text-white font-medium z-10">
                   <Grid className="w-4 h-4" />
                   <span>Builder</span>
                 </button>
-                <button
-                  onClick={() => handleCategoryClick("Search Products")}
-                  className="flex items-center space-x-2 px-4 py-2 bg-zinc-800 rounded-md text-sm text-white font-medium z-10"
-                >
+                <button onClick={() => handleCategoryClick("Search Products")} className="flex items-center space-x-2 px-4 py-2 bg-zinc-800 rounded-md text-sm text-white font-medium z-10">
                   <Grid className="w-4 h-4" />
                   <span>Search Products</span>
                 </button>
@@ -318,12 +261,14 @@ export default function Component() {
         {isSearching && (
           <div className="w-full max-w-7xl">
             <div className="flex flex-col md:flex-row gap-6">
-              <aside className="w-full md:w-1/3">
-                <VideoSuggestions mainVideo={mainVideo} suggestedVideos={suggestedVideos} isLoading={isVideoLoading} />
+              <aside className="w-full md:w-1/3 md:sticky md:top-[72px] md:self-start">
+                <div ref={videoSuggestionsRef} className="md:max-h-[calc(100vh-100px)] md:overflow-y-auto">
+                  <VideoSuggestions mainVideo={mainVideo} suggestedVideos={suggestedVideos} isLoading={isVideoLoading} />
+                </div>
               </aside>
               <div className="w-full md:w-2/3">
                 <div className="sticky top-[72px] z-40 py-4">
-                  <h2 className="text-xl  font-semibold mb-4">Search Results</h2>
+                  <h2 className="text-xl font-semibold mb-4">Search Results</h2>
                   <form onSubmit={handleSubmit} className="relative w-full mb-4">
                     <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white" />
                     <input
@@ -331,7 +276,7 @@ export default function Component() {
                       value={searchQuery}
                       onChange={handleInputChange}
                       placeholder="Ask anything about the products..."
-                      className="w-full py-4 pl-14 pr-20 bg-zinc-900 rounded-full text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-600"
+                      className="w-full py-4 pl-14 pr-20 bg-zinc-900 rounded-full text-white placeholder-zinc-400  focus:outline-none focus:ring-2 focus:ring-zinc-600"
                     />
                     <button
                       type="submit"
@@ -341,30 +286,32 @@ export default function Component() {
                     </button>
                   </form>
                 </div>
-                {isLoading ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {[1, 2, 3].map((item) => (
-                      <Card key={item} className="bg-gray-800 animate-pulse">
-                        <CardContent className="p-4">
-                          <div className="w-full h-40 bg-gray-700 rounded-md mb-4"></div>
-                          <div className="h-6 bg-gray-700 rounded w-3/4 mb-2"></div>
-                          <div className="h-4 bg-gray-700 rounded w-1/2"></div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {Array.isArray(searchResults) && searchResults.map((result: SearchResult, index: number) => (
-                      <SearchResultCard key={index} result={result} />
-                    ))}
-                  </div>
-                )}
+                <div ref={productListRef} className="md:max-h-[calc(100vh-200px)] md:overflow-y-auto">
+                  {isLoading ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {[1, 2, 3].map((item) => (
+                        <Card key={item} className="bg-gray-800 animate-pulse">
+                          <CardContent className="p-4">
+                            <div className="w-full h-40 bg-gray-700 rounded-md mb-4"></div>
+                            <div className="h-6 bg-gray-700 rounded w-3/4 mb-2"></div>
+                            <div className="h-4 bg-gray-700 rounded w-1/2"></div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {searchResults.map((result: SearchResult) => (
+                        <SearchResultCard key={result.id} result={result} />
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
         )}
       </main>
     </div>
-  );
+  )
 }
