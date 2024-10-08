@@ -1,18 +1,31 @@
 "use client"
 
-import { Search, Menu, Grid, MessageSquare, TrendingUp, Heart, Play } from "lucide-react"
+import { Search, Menu, Grid, MessageSquare, TrendingUp, Heart, Play, X } from "lucide-react"
 import { useState, useEffect, useRef } from "react"
 import LogoMinato from "./LogoMinato"
 import CanvasCursor from "./CursorCanvas/canvas-cursor"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import React from "react"
+import Image from "next/image"
 
 interface SearchResult {
   id: number
   name: string
   price: number
 }
+
+interface Video {
+  id: string
+  title: string
+  thumbnail: string
+  duration: string
+}
+
+const isVideo = (url: string) => {
+  const videoExtensions = ['.mp4', '.webm', '.ogg'];
+  return videoExtensions.some(ext => url.toLowerCase().endsWith(ext));
+};
 
 export default function Component() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -21,7 +34,7 @@ export default function Component() {
   const [searchResults, setSearchResults] = useState<SearchResult[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [isVideoLoading, setIsVideoLoading] = useState(true)
-
+  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null)
 
   const placeholders = [
     "Search for any product...",
@@ -59,8 +72,6 @@ export default function Component() {
     };
   }, []);
 
-
-
   const productListRef = useRef<HTMLDivElement>(null)
   const videoSuggestionsRef = useRef<HTMLDivElement>(null)
 
@@ -72,10 +83,10 @@ export default function Component() {
   }
 
   const suggestedVideos = [
-    { id: "sugg1", title: "Comment utiliser l'IA dans votre entreprise", thumbnail: "/placeholder.svg?height=120&width=180", duration: "5:15" },
-    { id: "sugg2", title: "L'avenir de l'IA dans le commerce électronique", thumbnail: "/placeholder.svg?height=120&width=180", duration: "7:45" },
-    { id: "sugg3", title: "IA et personnalisation : ce que vous devez savoir", thumbnail: "/placeholder.svg?height=120&width=180", duration: "6:20" },
-    { id: "sugg4", title: "Les meilleures pratiques en IA pour 2024", thumbnail: "/placeholder.svg?height=120&width=180", duration: "8:00" },
+    { id: "sugg1", title: "Comment utiliser l'IA dans votre entreprise", thumbnail: "https://res.cloudinary.com/dqljfnmpk/video/upload/v1724933253/Download_11_xyj1eg.mp4", duration: "5:15" },
+    { id: "sugg2", title: "L'avenir de l'IA dans le commerce électronique", thumbnail: "https://res.cloudinary.com/dqljfnmpk/video/upload/v1724933253/Download_11_xyj1eg.mp4", duration: "7:45" },
+    { id: "sugg3", title: "IA et personnalisation : ce que vous devez savoir", thumbnail: "https://res.cloudinary.com/dqljfnmpk/video/upload/v1724933253/Download_11_xyj1eg.mp4", duration: "6:20" },
+    { id: "sugg4", title: "Les meilleures pratiques en IA pour 2024", thumbnail: "/6.png", duration: "8:00" },
   ]
 
   useEffect(() => {
@@ -109,12 +120,13 @@ export default function Component() {
     setIsLoading(false)
     setIsVideoLoading(false)
   }
+
   const recentDesigns = [
     {  image: "/1.png", modifiedDays: 2 },
     {  image: "/2.png", modifiedDays: 3 },
     {  image: "/3.png", modifiedDays: 1 },
     {  image: "/4.png", modifiedDays: 4 },
-]
+  ]
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value)
@@ -124,14 +136,23 @@ export default function Component() {
     e.preventDefault()
     handleSearch(searchQuery)
   }
+
   const handleCategoryClick = (category: string) => {
     setSearchQuery(category);
     handleSearch(category);
   };
 
+  const handleVideoClick = (video: Video) => {
+    setSelectedVideo(video);
+  };
+
+  const closeVideoPopup = () => {
+    setSelectedVideo(null);
+  };
+
   function VideoSuggestions({ mainVideo, suggestedVideos, isLoading }: {
-    mainVideo: any
-    suggestedVideos: any[]
+    mainVideo: Video
+    suggestedVideos: Video[]
     isLoading: boolean
   }) {
     if (isLoading) {
@@ -167,11 +188,27 @@ export default function Component() {
     return (
       <div className="w-full space-y-4">
         <Card className="bg-gray-800 rounded-md overflow-hidden">
-          <CardContent className="p-0 relative">
-            <img src={mainVideo.thumbnail} alt={mainVideo.title} className="w-full h-48 object-cover" />
-            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
-              <Play className="w-12 h-12 text-white" />
-            </div>
+          <CardContent className="p-0 relative cursor-pointer" onClick={() => handleVideoClick(mainVideo)}>
+            {isVideo(mainVideo.thumbnail) ? (
+              <div className="relative w-full h-40 rounded-md">
+                <video 
+                src={mainVideo.thumbnail} 
+                className="w-full h-40 object-cover rounded-md" 
+                controls
+              />
+                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                  <Play className="w-12 h-12 text-white" />
+                </div>
+              </div>
+            ) : (
+              <Image
+                src={mainVideo.thumbnail}
+                alt={mainVideo.title}
+                width={600}
+                height={300}
+                className="w-full h-40 object-cover rounded-md"
+              />
+            )}
             <div className="p-3">
               <h3 className="text-base font-semibold text-white truncate">{mainVideo.title}</h3>
               <p className="text-xs text-gray-400">{mainVideo.duration}</p>
@@ -182,8 +219,26 @@ export default function Component() {
         <div className="flex overflow-x-auto space-x-4 pb-4 md:grid md:grid-cols-2 md:gap-4 md:space-x-0">
           {suggestedVideos.map((video) => (
             <Card key={video.id} className="bg-gray-800 rounded-md overflow-hidden flex-shrink-0 w-60 md:w-auto">
-              <CardContent className="p-0 relative">
-                <img src={video.thumbnail} alt={String(video.title)} className="w-full h-24 object-cover" />
+              <CardContent className="p-0 relative cursor-pointer" onClick={() => handleVideoClick(video)}>
+                {isVideo(video.thumbnail) ? (
+                  <div className="relative w-full h-24 rounded-md">
+                    <video 
+                    src={video.thumbnail} 
+                    className="w-full h-24 object-cover rounded-md" 
+                  />
+                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                      <Play className="w-8 h-8 text-white" />
+                    </div>
+                  </div>
+                ) : (
+                  <Image
+                    src={video.thumbnail}
+                    alt={String(video.title)}
+                    width={180}
+                    height={120}
+                    className="w-full h-24 object-cover rounded-md"
+                  />
+                )}
                 <div className="absolute bottom-1 right-1 bg-black bg-opacity-75 text-white text-xs px-1 rounded">
                   {String(video.duration)}
                 </div>
@@ -202,31 +257,31 @@ export default function Component() {
     return (
       <div className="space-y-4 z-10">
         {recentDesigns.map((design, index) => (
-      <Card key={index} className="bg-gray-800 rounded-md overflow-hidden w-full">
-        <CardContent className="p-3">
-          <div className="w-full h-32 bg-gray-700 rounded-md mb-3">
-            <img src={design.image} alt={result.name} className="w-full h-full object-cover rounded-md" />
-          </div>
-          <h3 className="text-base font-semibold text-white truncate">{result.name}</h3>
-          <p className="text-xs text-gray-50">Price: {result.price} €</p>
-          <p className="text-xs text-gray-400">{design.modifiedDays} days ago</p>
-        </CardContent>
-        <CardFooter className="bg-gray-700 p-1.5 flex justify-between">
-          <Button variant="ghost" size="sm" className="text-white hover:text-gray-200 text-xs px-1.5 py-1 z-10">
-            <MessageSquare className="w-3 h-3 mr-1" />
-            Chat
-          </Button>
-          <Button variant="ghost" size="sm" className="text-white hover:text-gray-200 text-xs px-1.5 py-1 z-10">
-            <TrendingUp className="w-3 h-3 mr-1" />
-            Track
-          </Button>
-          <Button variant="ghost" size="sm" className="text-white hover:text-gray-200 text-xs px-1.5 py-1 z-10">
-            <Heart className="w-3 h-3 mr-1" />
-            Fav
-          </Button>
-        </CardFooter>
-      </Card>
-      ))}
+          <Card key={index} className="bg-gray-800 rounded-md overflow-hidden w-full">
+            <CardContent className="p-3">
+              <div className="w-full h-32 bg-gray-700 rounded-md mb-3">
+                <Image src={design.image} alt={result.name} width={300} height={128} className="w-full h-full object-cover rounded-md" />
+              </div>
+              <h3 className="text-base font-semibold text-white truncate">{result.name}</h3>
+              <p className="text-xs text-gray-50">Price: {result.price} €</p>
+              <p className="text-xs text-gray-400">{design.modifiedDays} days ago</p>
+            </CardContent>
+            <CardFooter className="bg-gray-700 p-1.5 flex justify-between">
+              <Button variant="ghost" size="sm" className="text-white hover:text-gray-200 text-xs px-1.5 py-1 z-10">
+                <MessageSquare className="w-3 h-3 mr-1" />
+                Chat
+              </Button>
+              <Button variant="ghost" size="sm" className="text-white hover:text-gray-200 text-xs px-1.5 py-1 z-10">
+                <TrendingUp className="w-3 h-3 mr-1" />
+                Track
+              </Button>
+              <Button variant="ghost" size="sm" className="text-white hover:text-gray-200 text-xs px-1.5 py-1 z-10">
+                <Heart className="w-3 h-3 mr-1" />
+                Fav
+              </Button>
+            </CardFooter>
+          </Card>
+        ))}
       </div>
     )
   }
@@ -250,7 +305,7 @@ export default function Component() {
             <span className="text-sm font-medium text-white">Login</span>
           </button>
         </div>
-        <div className="absolute top-0 left-0 right-0 h-[2px] whatsapp-status-bar"></div>
+        <div className="absolute top-0  left-0 right-0 h-[2px] whatsapp-status-bar"></div>
       </header>
       <main className="flex flex-col items-center justify-center w-full space-y-8 mt-36 px-4">
         {!isSearching && (
@@ -272,7 +327,7 @@ export default function Component() {
                   onChange={handleInputChange}
                   placeholder={placeholders[currentPlaceholder]}
                   required
-                  className="w-full py-4 pl-14 pr-20 bg-zinc-900 rounded-full text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-600"
+                  className="w-full py-4 pl-14 pr-20  bg-zinc-900 rounded-full text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-600"
                 />
                 <button
                   type="submit"
@@ -353,6 +408,26 @@ export default function Component() {
           </div>
         )}
       </main>
+      {selectedVideo && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+          <div className="bg-zinc-900 rounded-lg overflow-hidden w-full max-w-md h-full flex flex-col">
+            <div className="p-4 flex justify-between items-center bg-zinc-800">
+              <h3 className="text-lg font-semibold text-white truncate">{selectedVideo.title}</h3>
+              <button onClick={closeVideoPopup} className="text-gray-400 hover:text-white">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <div className="relative w-full h-full" style={{ paddingBottom: "56.25%" }}>
+              <video
+                src={selectedVideo.thumbnail}
+                className="absolute inset-0 w-full h-full object-cover"
+                controls
+                autoPlay
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
