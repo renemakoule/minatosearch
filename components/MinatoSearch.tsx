@@ -22,6 +22,45 @@ export default function Component() {
   const [isLoading, setIsLoading] = useState(false)
   const [isVideoLoading, setIsVideoLoading] = useState(true)
 
+
+  const placeholders = [
+    "Search for any product...",
+    "Search for anything...",
+    "What's on your mind?",
+    "Discover new ideas",
+    "Find answers here",
+    "Ask anything about the products..."
+  ];
+  const [currentPlaceholder, setCurrentPlaceholder] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [gradient, setGradient] = useState("from-blue-500 to-purple-500");
+
+  useEffect(() => {
+    const placeholderInterval = setInterval(() => {
+      setIsAnimating(true);
+      setTimeout(() => {
+        setCurrentPlaceholder((prev) => (prev + 1) % placeholders.length);
+        setIsAnimating(false);
+      }, 500);
+    }, 3000);
+
+    const gradientInterval = setInterval(() => {
+      const gradients = [
+        "from-blue-500 via-pink-500 to-purple-500",
+        "from-green-600 via-purple-600 to-blue-600",
+        "from-pink-500 to-yellow-500 via-red-500",
+      ];
+      setGradient(gradients[Math.floor(Math.random() * gradients.length)]);
+    }, 8000);
+
+    return () => {
+      clearInterval(placeholderInterval);
+      clearInterval(gradientInterval);
+    };
+  }, []);
+
+
+
   const productListRef = useRef<HTMLDivElement>(null)
   const videoSuggestionsRef = useRef<HTMLDivElement>(null)
 
@@ -231,7 +270,8 @@ export default function Component() {
                   type="text"
                   value={searchQuery}
                   onChange={handleInputChange}
-                  placeholder="Search for any product..."
+                  placeholder={placeholders[currentPlaceholder]}
+                  required
                   className="w-full py-4 pl-14 pr-20 bg-zinc-900 rounded-full text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-600"
                 />
                 <button
@@ -275,7 +315,8 @@ export default function Component() {
                       type="text"
                       value={searchQuery}
                       onChange={handleInputChange}
-                      placeholder="Ask anything about the products..."
+                      placeholder={placeholders[currentPlaceholder]}
+                      required
                       className="w-full py-4 pl-14 pr-20 bg-zinc-900 rounded-full text-white placeholder-zinc-400  focus:outline-none focus:ring-2 focus:ring-zinc-600"
                     />
                     <button
