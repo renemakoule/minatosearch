@@ -96,3 +96,11 @@ body {
   background-size: 400% 100%;
   animation: whatsappStatusBar 10s linear infinite;
 }
+
+.hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
