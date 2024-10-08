@@ -187,7 +187,7 @@ export default function Component() {
 
     return (
       <div className="w-full space-y-4">
-        <Card className="bg-gray-800 rounded-md overflow-hidden">
+        <Card className="bg-gradient-to-r from-cyan-800 via-blue-900 to-purple-900 rounded-md overflow-hidden">
           <CardContent className="p-0 relative cursor-pointer" onClick={() => handleVideoClick(mainVideo)}>
             {isVideo(mainVideo.thumbnail) ? (
               <div className="relative w-full h-40 rounded-md">
@@ -257,7 +257,7 @@ export default function Component() {
     return (
       <div className="space-y-4 z-10">
         {recentDesigns.map((design, index) => (
-          <Card key={index} className="bg-gray-800 rounded-md overflow-hidden w-full">
+          <Card key={index} className="bg-gradient-to-r from-cyan-800 to-pink-500 rounded-md overflow-hidden w-full">
             <CardContent className="p-3">
               <div className="w-full h-32 bg-gray-700 rounded-md mb-3">
                 <Image src={design.image} alt={result.name} width={300} height={128} className="w-full h-full object-cover rounded-md" />
@@ -266,7 +266,7 @@ export default function Component() {
               <p className="text-xs text-gray-50">Price: {result.price} €</p>
               <p className="text-xs text-gray-400">{design.modifiedDays} days ago</p>
             </CardContent>
-            <CardFooter className="bg-gray-700 p-1.5 flex justify-between">
+            <CardFooter className="p-1.5 flex justify-between">
               <Button variant="ghost" size="sm" className="text-white hover:text-gray-200 text-xs px-1.5 py-1 z-10">
                 <MessageSquare className="w-3 h-3 mr-1" />
                 Chat
