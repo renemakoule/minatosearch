@@ -302,7 +302,7 @@ export default function Component() {
           <div className="w-full max-w-7xl">
             <div className="flex flex-col md:flex-row gap-6">
               <aside className="w-full md:w-1/3 md:sticky md:top-[72px] md:self-start">
-                <div ref={videoSuggestionsRef} className="md:max-h-[calc(100vh-100px)] md:overflow-y-auto">
+                <div ref={videoSuggestionsRef} className="md:max-h-[calc(100vh-100px)] md:overflow-y-auto hide-scrollbar">
                   <VideoSuggestions mainVideo={mainVideo} suggestedVideos={suggestedVideos} isLoading={isVideoLoading} />
                 </div>
               </aside>
@@ -327,7 +327,7 @@ export default function Component() {
                     </button>
                   </form>
                 </div>
-                <div ref={productListRef} className="md:max-h-[calc(100vh-200px)] md:overflow-y-auto">
+                <div ref={productListRef} className="md:max-h-[calc(100vh-200px)] md:overflow-y-auto hide-scrollbar">
                   {isLoading ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       {[1, 2, 3].map((item) => (
