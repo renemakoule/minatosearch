@@ -210,12 +210,13 @@ export default function Component() {
     return (
       <div className="space-y-4">
           {recentDesigns.map((design, index) => (
-              <Card key={index} className="bg-gray-800 rounded-md overflow-hidden w-full">
+              <Card key={result.id} className="bg-gray-800 rounded-md overflow-hidden w-full">
                   <CardContent className="p-3">
                       <div className="w-full h-32 bg-gray-700 rounded-md mb-3">
                           <img src={design.image} alt={design.title} className="w-full h-full object-cover rounded-md" />
                       </div>
                       <h3 className="text-base font-semibold text-white truncate">{design.title}</h3>
+                      <p className="text-xs text-gray-50">Price: {result.price} €</p>
                       <p className="text-xs text-gray-400">Modified {design.modifiedDays} days ago</p>
                   </CardContent>
                   <CardFooter className="bg-gray-700 p-1.5 flex justify-between">
